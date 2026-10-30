@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display Book</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        select {
+            padding: 6px;
+        }
+        .error {
+            color: #b91c1c;
+        }
+    </style>
+</head>
+<body>
+    <h1>Book Records</h1>
+
+    <label for="bookSelect">Select a book title:</label>
+    <select id="bookSelect">
+        <option value="">-- Select a book --</option>
+    </select>
+
+    <p id="message"></p>
+
+    <div id="details">
+        <p>Title: <span id="title"></span></p>
+        <p>Author: <span id="author"></span></p>
+        <p>Publication Year: <span id="year"></span></p>
+        <p>Genre: <span id="genre"></span></p>
+    </div>
+
+    <script>
+        // raw GitHub link to books.json
+        var jsonUrl = "https://raw.githubusercontent.com/adilmohdhafiz/lab06-json/main/books.json";
+
+        var select = document.getElementById("bookSelect");
+        var message = document.getElementById("message");
+        var books = [];
+
+        // fetch the JSON data from GitHub
+        fetch(jsonUrl)
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error("Could not load books.json (status " + response.status + ")");
+                }
+                return response.json();
+            })
+            .then(function (data) {
+                books = data.Books;
+
+                // add one option for each book title
+                for (var i = 0; i < books.length; i++) {
+                    var option = document.createElement("option");
+                    option.value = books[i].title;
+                    option.textContent = books[i].title;
+                    select.appendChild(option);
+                }
+            })
+            .catch(function (error) {
+                message.className = "error";
+                message.textContent = "Error: " + error.message;
+            });
+
+        // when the user chooses a title, find the matching book record
+        select.addEventListener("change", function () {
+            var chosen = select.value;
+
+            var book = books.find(function (b) {
+                return b.title === chosen;
+            });
+
+            if (book) {
+                document.getElementById("title").textContent = book.title;
+                document.getElementById("author").textContent = book.author;
+                document.getElementById("year").textContent = book.publicationYear;
+                document.getElementById("genre").textContent = book.genres.join(", ");
+            } else {
+                document.getElementById("title").textContent = "";
+                document.getElementById("author").textContent = "";
+                document.getElementById("year").textContent = "";
+                document.getElementById("genre").textContent = "";
+            }
+        });
+    </script>
+</body>
+</html>
